@@ -1,0 +1,88 @@
+body {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    margin: 0;
+    background: linear-gradient(to right, white, rgb(190, 190, 224));
+    overflow: hidden;
+}
+
+@keyframes open {
+    from {height: 60px;}
+    to {height: 0px;}
+}
+
+@keyframes close {
+    from {height: 0px;}
+    to {height: 60px;}
+}
+
+#header {
+    z-index: 2;
+    position: fixed;
+    top: -30px;
+    left: 0;
+    width: 100%;
+}
+
+#topBanner {
+    top: 0;
+    height: 90px;
+    padding-top: 20px;
+    text-align: center;
+    vertical-align: bottom;
+    background-color: rgb(108, 88, 196);
+}
+
+#topBanner h1 {
+    font-style: italic;
+    font-size: 40px;
+    color: white;
+}
+
+#uploadBar {
+    width: 100%;
+    top: 90px;
+}
+
+#uploadBarContents {
+    overflow: hidden;
+    height: 60px;
+    background-color: cornflowerblue;
+}
+
+#uploadBarContents > * {
+    display: inline-block;
+}
+
+#uploadBarContents > button {
+    margin-left: 2%;
+    padding: 12px 12px;
+    font-size: 16px;
+    background-color: rgb(108, 88, 196);
+    color: white;
+    border: none;
+}
+
+#uploadBarContents > button:hover {
+    background-color: rgb(46, 42, 112);
+}
+
+#videoSearch {
+    padding-top: 20px;
+    height: 60px;
+}
+
+.scrollContainer {
+    position: absolute;
+    top: 210px;
+    height: 630px;
+    width: 100%;
+    overflow: auto;
+    color: white;
+    background-color: black;
+}
+
+#videoResults {
+    height: 2000px;
+    
+    background-color: rgb(46, 13, 65);
+}

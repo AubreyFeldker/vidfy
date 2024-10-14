@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <title>Vidfy</title>
+    <link rel="stylesheet" href="index.css" />
+</head>
+
+<body>
+    <div id="header">
+        <div id="topBanner">
+            <h1>Find the right video for you!</h1>
+        </div>   
+        <div id="uploadBar">
+            <div id="uploadBarContents">
+                <button type="button" id="btn">Upload Video</button>
+                <p>File path: <i id="filePath"></i></p>
+            </div>
+        </div>
+        <div id="videoSearch">
+            <label for="searchInput">Video tags:</label>
+            <input type="text" id="searchInput" name="searchInput">
+        </div>
+    </div>
+    
+    <div class="scrollContainer">
+        <h2>Results</h2>
+        <div id="videoResults"></div>
+    </div>
+    <script src='./renderer.js'></script>
+</body>
+
+</html>
