@@ -2,17 +2,41 @@ const { app, BrowserWindow, ipcMain, dialog } = require('electron/main');
 const path = require('node:path');
 
 const axios = require("axios");
-const { response } = require('express');
+
+const fs  = require("fs");
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
     app.quit();
 }
 
+async function uploadFile(formData) {
+    const onUploadProgress = (event) => {
+      const percentage = Math.round((100 * event.loaded) / event.total);
+      console.log(percentage);
+    };
+  
+    try {
+      const response = await axios.post('http://localhost:5000/file-upload', formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        onUploadProgress,
+      });
+  
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
 async function handleFileOpen(dialogueArgs) {
-    const { canceled, filePaths } = await dialog.showOpenDialog(dialogueArgs);
+    const { canceled, filePaths } = await dialog.showOpenDialog();
     if (!canceled) {
-        return filePaths[0];
+        const form = new FormData();
+        form.append('video', fs.readFileSync(filePaths[0]));
+          
+        return uploadFile(form)
     }
 };
 

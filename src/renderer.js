@@ -2,8 +2,8 @@ const btn = document.querySelector('#uploadButton');
 const filePathElement = document.querySelector('#filePath');
 
 btn.addEventListener('click', async () => {
-    const filePath = await window.electronAPI.openFile();
-    filePathElement.innerText = filePath ?? "";
+    console.log((await window.electronAPI.openFile()).data);
+    //filePathElement.innerText = filePath ?? "";
 });
 
 const uploadToggle = document.querySelector('#uploadBarToggle');
