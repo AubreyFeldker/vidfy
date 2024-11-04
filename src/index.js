@@ -1,17 +1,28 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron/main');
 const path = require('node:path');
 
+const axios = require("axios");
+const { response } = require('express');
+
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
     app.quit();
 }
 
-async function handleFileOpen() {
-    const { canceled, filePaths } = await dialog.showOpenDialog();
+async function handleFileOpen(dialogueArgs) {
+    const { canceled, filePaths } = await dialog.showOpenDialog(dialogueArgs);
     if (!canceled) {
         return filePaths[0];
     }
 };
+
+async function getRequest(req) {
+    console.log(req);
+    axios.get(req).then(response => {
+        console.log(response.data);
+        return response;
+    });
+}
 
 const createWindow = () => {
     // Create the browser window.
@@ -31,7 +42,8 @@ const createWindow = () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-    ipcMain.handle('dialog:openFile', handleFileOpen);
+    ipcMain.handle('dialog:openFile', (event, ...args) => handleFileOpen(...args));
+    ipcMain.handle('makeRequest', (event, ...args) => getRequest(...args));
     createWindow();
 
     // On OS X it's common to re-create a window in the app when the

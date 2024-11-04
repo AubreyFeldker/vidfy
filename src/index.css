@@ -5,14 +5,22 @@ body {
     overflow: hidden;
 }
 
-@keyframes open {
+@keyframes close {
     from {height: 60px;}
     to {height: 0px;}
 }
 
-@keyframes close {
+@keyframes open {
     from {height: 0px;}
     to {height: 60px;}
+}
+
+.opened {
+    animation: open 2s ease-in-out 1 forwards;
+}
+
+.closed {
+    animation: close 2s ease-in-out 1 forwards;
 }
 
 #header {
@@ -45,7 +53,7 @@ body {
 
 #uploadBarContents {
     overflow: hidden;
-    height: 60px;
+    height: 0px;
     background-color: cornflowerblue;
 }
 
@@ -53,7 +61,7 @@ body {
     display: inline-block;
 }
 
-#uploadBarContents > button {
+.btn {
     margin-left: 2%;
     padding: 12px 12px;
     font-size: 16px;
@@ -62,13 +70,14 @@ body {
     border: none;
 }
 
-#uploadBarContents > button:hover {
+.btn:hover {
     background-color: rgb(46, 42, 112);
 }
 
 #videoSearch {
     padding-top: 20px;
     height: 60px;
+    background-color: cornflowerblue;
 }
 
 .scrollContainer {

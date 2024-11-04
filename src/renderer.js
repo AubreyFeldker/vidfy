@@ -1,22 +1,21 @@
-const btn = document.getElementById('btn');
-const filePathElement = document.getElementById('filePath');
+const btn = document.querySelector('#uploadButton');
+const filePathElement = document.querySelector('#filePath');
 
 btn.addEventListener('click', async () => {
     const filePath = await window.electronAPI.openFile();
-    filePathElement.innerText = filePath;
+    filePathElement.innerText = filePath ?? "";
 });
 
 const uploadToggle = document.querySelector('#uploadBarToggle');
 
 uploadToggle.addEventListener('click', async () => {
     const uploadBar = document.querySelector('#uploadBarContents');
-    uploadBar.className = ((uploadBar.className ?? "opened") === "opened") ? "closed" : "opened";
+    uploadBar.className = ((uploadBar.className ?? "closed") === "opened") ? "closed" : "opened";
 });
 
-/* const vidBox = document.querySelector('#videoResults');
+const searchButton = document.querySelector('#searchButton');
+const searchInput = document.querySelector('#searchInput');
 
-let text = "";
-for (let i = 0; i < 40; i++)
-    text += "<p>text</p>";
-
-vidBox.innerHTML = text; */
+searchButton.addEventListener('click', async () => {
+    const response = await window.electronAPI.makeRequest("http://localhost:5000");
+});
