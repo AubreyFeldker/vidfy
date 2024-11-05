@@ -19,13 +19,3 @@ const searchInput = document.querySelector('#searchInput');
 searchButton.addEventListener('click', async () => {
     const response = await window.electronAPI.makeRequest("http://localhost:5000");
 });
-
-const fileInput = document.getElementById('fileInput');
-
-fileInput.addEventListener('change', (event) => {
-  const file = event.target.files[0]; 
-  console.log(event.target);
-  if (file) {
-    window.electronAPI.uploadFile(file);
-  }
-});

@@ -10,41 +10,6 @@ if (require('electron-squirrel-startup')) {
     app.quit();
 }
 
-async function getImageFileFromUrl(url){
-    let response = await fetch(url);
-    let data = await response.blob();
-    let metadata = {
-      type: "image/png"
-    };
-    return new File([data], "result.png", metadata);
-}
-
-async function uploadFile(file) {
-    const onUploadProgress = (event) => {
-      const percentage = Math.round((100 * event.loaded) / event.total);
-      console.log(percentage);
-    };
-  
-    try {
-        const form = new FormData();
-        form.append('name', "vidfyUser");
-        form.append('video', file);
-
-        console.log(file);
-
-        const response = await axios.post('http://localhost:5000/file-upload', form, {
-            headers: {
-                "Content-Type": "multipart/form-data",
-            },
-            onUploadProgress,
-        });
-  
-        //console.log(response);
-    } catch (error) {
-        console.log(error);
-    }
-  }
-
 async function handleFileOpen(dialogueArgs) {
     const { canceled, filePaths } = await dialog.showOpenDialog();
     if (!canceled) {
