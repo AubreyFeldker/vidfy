@@ -10,33 +10,58 @@ if (require('electron-squirrel-startup')) {
     app.quit();
 }
 
-async function uploadFile(formData) {
+async function getImageFileFromUrl(url){
+    let response = await fetch(url);
+    let data = await response.blob();
+    let metadata = {
+      type: "image/png"
+    };
+    return new File([data], "result.png", metadata);
+}
+
+async function uploadFile(file) {
     const onUploadProgress = (event) => {
       const percentage = Math.round((100 * event.loaded) / event.total);
       console.log(percentage);
     };
   
     try {
-      const response = await axios.post('http://localhost:5000/file-upload', formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        onUploadProgress,
-      });
+        const form = new FormData();
+        form.append('name', "vidfyUser");
+        form.append('video', file);
+
+        console.log(file);
+
+        const response = await axios.post('http://localhost:5000/file-upload', form, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+            onUploadProgress,
+        });
   
-      console.log(response);
+        //console.log(response);
     } catch (error) {
-      console.log(error);
+        console.log(error);
     }
   }
 
 async function handleFileOpen(dialogueArgs) {
     const { canceled, filePaths } = await dialog.showOpenDialog();
     if (!canceled) {
+        const file = new File([fs.readFileSync(filePaths[0])], filePaths[0])
         const form = new FormData();
-        form.append('video', fs.readFileSync(filePaths[0]));
+        form.append('name', "video");
+
+        form.append('video', file);
+
+        console.log(form);
+
+        const response = await fetch("http://localhost:5000/file-upload", {
+            method: 'POST',
+            body: form
+        })
           
-        return uploadFile(form)
+        console.log(response);
     }
 };
 
@@ -67,6 +92,7 @@ const createWindow = () => {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
     ipcMain.handle('dialog:openFile', (event, ...args) => handleFileOpen(...args));
+    ipcMain.handle('uploadFile', (event, ...args) => handleFileOpen(...args));
     ipcMain.handle('makeRequest', (event, ...args) => getRequest(...args));
     createWindow();
 

@@ -90,3 +90,6 @@ typings/
 
 # Electron-Forge
 out/
+
+# Video files
+video_files/

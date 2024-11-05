@@ -6,5 +6,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
           { name: 'Videos', extensions: ['mkv', 'avi', 'mp4'] },
         ]
       }),
-    makeRequest: (req) => ipcRenderer.invoke('makeRequest', req)
+    uploadFile: (file) => ipcRenderer.invoke('uploadFile', file),
 });

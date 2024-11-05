@@ -14,10 +14,10 @@ app.get("/", function (request, response) {
     response.send("Simple web server of files from " + __dirname);
   });
 
-  app.post("/file-upload", /*upload.single('video'),*/ function (request, response) {
+  app.post("/file-upload", upload.any('video'), function (req, res) {
     //fs.createWriteStream('./videofiles/file.png', request.data);
-    console.log(request.config);
-    response.send({message: "i got the file"});
+    console.log(req.files);
+    res.send({message: "i got the file"});
   });
 
 const server = app.listen(5000, function () {
