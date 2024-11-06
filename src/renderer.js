@@ -2,7 +2,9 @@ const btn = document.querySelector('#uploadButton');
 const filePathElement = document.querySelector('#filePath');
 
 btn.addEventListener('click', async () => {
-    console.log((await window.electronAPI.openFile()).data);
+    const tagsInput = document.querySelector('#tagsInput');
+    const tags = tagsInput.value.split(" ");
+    console.log((await window.electronAPI.openFile(tags)).data);
     //filePathElement.innerText = filePath ?? "";
 });
 

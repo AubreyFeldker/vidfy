@@ -5,17 +5,19 @@ const axios = require("axios");
 
 const fs  = require("fs");
 
+let tags = [];
+
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
     app.quit();
 }
 
-async function handleFileOpen(dialogueArgs) {
-    const { canceled, filePaths } = await dialog.showOpenDialog();
+async function handleFileOpen(args) {
+    const { canceled, filePaths } = await dialog.showOpenDialog(filters=args.filters);
     if (!canceled) {
         const file = new File([fs.readFileSync(filePaths[0])], filePaths[0])
         const form = new FormData();
-        form.append('name', "video");
+        form.append('tags', args.tags);
 
         form.append('video', file);
 
@@ -24,7 +26,7 @@ async function handleFileOpen(dialogueArgs) {
         const response = await fetch("http://localhost:5000/file-upload", {
             method: 'POST',
             body: form
-        })
+        });
           
         console.log(response);
     }
