@@ -1,10 +1,11 @@
 var proxy = require('express-http-proxy');
 const express = require("express");
-
 var bodyParser = require('body-parser')
+
 const axios = require("axios");
 const app = express();
 app.use( bodyParser.json() ); 
+app.use(express.static(__dirname + '/video_files'));
 
 let metadata_server_addr = null;
 const storage_addrs = [];
