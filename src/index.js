@@ -13,7 +13,8 @@ if (require('electron-squirrel-startup')) {
 }
 
 async function handleFileOpen(args) {
-    const { canceled, filePaths } = await dialog.showOpenDialog(filters=args.filters);
+    console.log(args.filters);
+    const { canceled, filePaths } = await dialog.showOpenDialog({filters: args.filters});
     if (!canceled) {
         const file = new File([fs.readFileSync(filePaths[0])], filePaths[0])
         const form = new FormData();
@@ -28,9 +29,15 @@ async function handleFileOpen(args) {
             body: form
         });
           
-        console.log(response);
+        return("Video uploaded!");
     }
 };
+
+async function search(args) {
+    const response = await axios.get("http://localhost:5000/search", {params: {tags: args.tags}});
+    console.log(response.data[0]);
+    return(response.data[0]);
+}
 
 async function getRequest(req) {
     console.log(req);
@@ -60,6 +67,7 @@ const createWindow = () => {
 app.whenReady().then(() => {
     ipcMain.handle('dialog:openFile', (event, ...args) => handleFileOpen(...args));
     ipcMain.handle('uploadFile', (event, ...args) => handleFileOpen(...args));
+    ipcMain.handle('search', (event, ...args) => search(...args));
     ipcMain.handle('makeRequest', (event, ...args) => getRequest(...args));
     createWindow();
 

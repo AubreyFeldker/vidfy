@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; media-src http://localhost:5000; img-src * 'self' data: http:;" >
     <title>Vidfy</title>
     <link rel="stylesheet" href="index.css" />
 </head>
@@ -31,7 +31,8 @@
     
     <div class="scrollContainer">
         <h2>Results</h2>
-        <div id="videoResults"></div>
+        <div id="videoResults">
+        </div>
     </div>
     <script src='./renderer.js'></script>
 </body>

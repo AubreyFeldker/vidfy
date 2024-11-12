@@ -5,12 +5,13 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const fileSchema = new Schema({
+    _id: Number,
     tags: [String],
 });
 
 const tagSchema = new Schema({
     word: String,
-    foundIn: [{type: Schema.Types.ObjectId, ref: 'File'}],
+    foundIn: [{type: Number, ref: 'File'}],
 
 });
 
@@ -34,9 +35,12 @@ app.post("/tag-list", async function (req, res) {
 });
 
 app.post("/", async function (req, res) {
+    console.log(req.body);
+    const file_id = req.body.file_id;
     const newTags = req.body.tags.split(",");
     
     const file = new File({
+        _id: file_id,
         tags: newTags
     });
     await file.save();
@@ -47,6 +51,13 @@ app.post("/", async function (req, res) {
     }
 
     res.status(200).json({file_id: file._id});
+});
+
+app.get("/search-tags", async function (req, res) {
+    const newTags = req.query.tags.split(" ");
+    const tag_response = await Tag.find({word: newTags[0]});
+    console.log(tag_response);
+    return res.status(200).json(tag_response);
 });
 
 axios.post("http://localhost:5000/link-server",

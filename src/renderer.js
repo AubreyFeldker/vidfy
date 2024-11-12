@@ -4,7 +4,7 @@ const filePathElement = document.querySelector('#filePath');
 btn.addEventListener('click', async () => {
     const tagsInput = document.querySelector('#tagsInput');
     const tags = tagsInput.value.split(" ");
-    console.log((await window.electronAPI.openFile(tags)).data);
+    console.log(await window.electronAPI.openFile(tags));
     //filePathElement.innerText = filePath ?? "";
 });
 
@@ -15,9 +15,20 @@ uploadToggle.addEventListener('click', async () => {
     uploadBar.className = ((uploadBar.className ?? "closed") === "opened") ? "closed" : "opened";
 });
 
+
 const searchButton = document.querySelector('#searchButton');
-const searchInput = document.querySelector('#searchInput');
 
 searchButton.addEventListener('click', async () => {
-    const response = await window.electronAPI.makeRequest("http://localhost:5000");
+    const searchInput = document.querySelector('#searchInput');
+    const tags = searchInput.value;
+    const response = await window.electronAPI.search(tags);
+    console.log(response);
+
+    const videoResults = document.querySelector('#videoResults');
+    let videoHTML = "";
+
+    response.forEach((video) => {
+        videoHTML += `<video width="500" controls><source src="${"http://localhost:5000"}/${video}.mp4" type="video/mp4"></video>`;
+    });
+    videoResults.innerHTML = videoHTML;
 });

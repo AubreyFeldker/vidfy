@@ -8,4 +8,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
         tags: tags
       }),
     uploadFile: (file) => ipcRenderer.invoke('uploadFile', file),
+    search: (tags) => ipcRenderer.invoke('search', {tags: tags}),
 });
