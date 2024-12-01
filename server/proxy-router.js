@@ -4,46 +4,48 @@ var bodyParser = require('body-parser')
 
 const axios = require("axios");
 const app = express();
-app.use( bodyParser.json() ); 
+app.use(bodyParser.json())
 app.use(express.static(__dirname + '/video_files'));
 
 let metadata_server_addr = null;
 const storage_addrs = [];
+const await_tags = new Map();
 
 app.get("/", function (req, res) {
     console.log("request achieved");
     res.send("Simple web server of files from " + __dirname);
 });
 
-const multer  = require('multer')
-
-var storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, './video_files/')
-    },
-    filename: function (req, file, cb) {
-        let extArray = file.mimetype.split("/");
-        let extension = extArray[extArray.length - 1];
-        console.log(extension);
-        cb(null, Date.now() + '.mp4')
+app.post("/file-upload", async function (req, res) {
+    if(storage_addrs.length == 0) {
+        console.log("Server infrastructure not fully connected.");
+        return res.status(400).json({id:-1, err:"Server infrastructure not fully connected."});
+    }
+    try {
+        const this_id = Date.now();
+        await_tags.set(this_id, req.body.tags);
+        res.status(200).send({vid_id: this_id, vid_server: storage_addrs[0]});
+    }
+    catch (error) {
+        res.status(400).send();
+        console.log(error);
     }
 });
-  
-var upload = multer({
-    storage: storage,
-    limits: { fieldSize: 100 * 1024 * 1024 }
-});
 
-app.post("/file-upload", upload.any('video'), async function (req, res) {
-    console.log(req.files);
+app.post("/file-confirm", async function (req, res) {
+    console.log(await_tags);
+    const await_tags_key = parseInt(req.body.this_id);
+    const file_tags = await_tags.get(await_tags_key) ?? [];
+    if (file_tags.length === 0)
+        res.status(400).send("Tags were not properly uploaded.");
     
-    if(!metadata_server_addr) {
-        console.log("No metadata server.");
-        return res.status(404).json({id:-1, err:"No metadata server."});
-    }
-
-    const file_id = parseInt(req.files[0].filename.split(".")[0]);
-    const metadata_res = await axios.post(metadata_server_addr, {file_id: file_id, tags: req.body.tags});
+    const metadata_res = await axios.post(metadata_server_addr, {
+        file_id: req.body.file_id,
+        file_loc: req.body.file_loc,
+        tags: file_tags,
+    });
+    
+    await_tags.delete(await_tags_key);
     console.log(metadata_res);
     res.status(200).send({message: "Video uploaded!"});
 });

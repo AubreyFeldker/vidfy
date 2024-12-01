@@ -21,14 +21,14 @@ const searchButton = document.querySelector('#searchButton');
 searchButton.addEventListener('click', async () => {
     const searchInput = document.querySelector('#searchInput');
     const tags = searchInput.value;
-    const response = await window.electronAPI.search(tags);
+    const response = await window.electronAPI.search(tags) ?? [];
     console.log(response);
 
     const videoResults = document.querySelector('#videoResults');
     let videoHTML = "";
 
     response.forEach((video) => {
-        videoHTML += `<video width="500" controls><source src="${"http://localhost:5000"}/${video}.mp4" type="video/mp4"></video>`;
+        videoHTML += `<video width="500" controls><source src="${video.locations[0]}/${video._id}.mp4" type="video/mp4"></video>`;
     });
     videoResults.innerHTML = videoHTML;
 });

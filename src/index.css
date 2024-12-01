@@ -92,6 +92,6 @@ body {
 
 #videoResults {
     height: 2000px;
-    
+    align-items: center;
     background-color: rgb(46, 13, 65);
 }

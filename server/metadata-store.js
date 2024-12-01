@@ -7,6 +7,7 @@ const { Schema } = mongoose;
 const fileSchema = new Schema({
     _id: Number,
     tags: [String],
+    locations: [String],
 });
 
 const tagSchema = new Schema({
@@ -35,13 +36,14 @@ app.post("/tag-list", async function (req, res) {
 });
 
 app.post("/", async function (req, res) {
-    console.log(req.body);
     const file_id = req.body.file_id;
-    const newTags = req.body.tags.split(",");
+    const file_loc = req.body.file_loc;
+    const newTags = req.body.tags;
     
     const file = new File({
         _id: file_id,
-        tags: newTags
+        tags: newTags,
+        locations: [file_loc],
     });
     await file.save();
 
@@ -55,9 +57,21 @@ app.post("/", async function (req, res) {
 
 app.get("/search-tags", async function (req, res) {
     const newTags = req.query.tags.split(" ");
-    const tag_response = await Tag.find({word: newTags[0]});
-    console.log(tag_response);
-    return res.status(200).json(tag_response);
+    const tag_files = (await Tag.find({word: newTags[0]}))[0].foundIn;
+    console.log(tag_files);
+    const files = [];
+    await Promise.all(tag_files.map(async (file) => {
+        const foundFile = await File.findOne({_id: file});
+        files.push(foundFile);
+    }));
+    console.log(await File.find({}));
+    return res.status(200).json(files);
+});
+
+app.post("/purge", async function (req, res) {
+    await File.deleteMany({});
+    await Tag.deleteMany({});
+    return res.status(200).json("Purged database");
 });
 
 axios.post("http://localhost:5000/link-server",
@@ -65,7 +79,8 @@ axios.post("http://localhost:5000/link-server",
         type: "metadata",
         address: "http://localhost:6000"
     }
-).then((res) => console.log(res));
+).then((res) => console.log(res))
+.catch((err) => console.log(err));
 
 const server = app.listen(6000, function () {
     const port = server.address().port;

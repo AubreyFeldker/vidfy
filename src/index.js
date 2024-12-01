@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron/main');
 const path = require('node:path');
+const proxy_server = "http://localhost:5000";
 
 const axios = require("axios");
 
@@ -15,28 +16,30 @@ if (require('electron-squirrel-startup')) {
 async function handleFileOpen(args) {
     console.log(args.filters);
     const { canceled, filePaths } = await dialog.showOpenDialog({filters: args.filters});
-    if (!canceled) {
+    if (!canceled && args.tags != "") {
+        const prox_res = await axios.post(`http://localhost:5000/file-upload`, {tags: args.tags})
         const file = new File([fs.readFileSync(filePaths[0])], filePaths[0])
+   
         const form = new FormData();
-        form.append('tags', args.tags);
-
         form.append('video', file);
 
-        console.log(form);
-
-        const response = await fetch("http://localhost:5000/file-upload", {
-            method: 'POST',
-            body: form
-        });
-          
-        return("Video uploaded!");
+        console.log(prox_res);
+       // prox_res.then((res) => async function() {
+            console.log(prox_res);
+            form.append('id', prox_res.data.vid_id);
+            const response = await fetch(`${prox_res.data.vid_server}/file-upload`, {
+                method: 'POST',
+                body: form
+            });
+            return("Video uploaded!");
+        //});
     }
 };
 
 async function search(args) {
     const response = await axios.get("http://localhost:5000/search", {params: {tags: args.tags}});
-    console.log(response.data[0]);
-    return(response.data[0]);
+    console.log(response.data);
+    return(response.data);
 }
 
 async function getRequest(req) {
