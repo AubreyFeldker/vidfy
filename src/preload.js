@@ -3,7 +3,7 @@ const { contextBridge, ipcRenderer } = require('electron/renderer');
 contextBridge.exposeInMainWorld('electronAPI', {
     openFile: (tags) => ipcRenderer.invoke('dialog:openFile', {
         filters: [
-          { name: 'Videos', extensions: ['mkv', 'avi', 'mp4'] },
+          { name: 'Videos', extensions: ['mp4'] },
         ],
         tags: tags
       }),

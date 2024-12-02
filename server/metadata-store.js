@@ -57,7 +57,10 @@ app.post("/", async function (req, res) {
 
 app.get("/search-tags", async function (req, res) {
     const newTags = req.query.tags.split(" ");
-    const tag_files = (await Tag.find({word: newTags[0]}))[0].foundIn;
+    const tags = await Tag.find({word: newTags[0]});
+    if (tags.length === 0)
+        return res.status(400).json({msg: "No videos with those tags found."});
+    const tag_files = tags[0].foundIn;
     console.log(tag_files);
     const files = [];
     await Promise.all(tag_files.map(async (file) => {

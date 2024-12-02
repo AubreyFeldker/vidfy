@@ -28,7 +28,7 @@ searchButton.addEventListener('click', async () => {
     let videoHTML = "";
 
     response.forEach((video) => {
-        videoHTML += `<video width="500" controls><source src="${video.locations[0]}/${video._id}.mp4" type="video/mp4"></video>`;
+        videoHTML += `<video width="500" controls><source src="${video.location}/thumbs/${video._id}.mov" type="video/mp4"></video><p><a href="${video.location}/fulls/${video._id}.mov">Download original video.</a></p>`;
     });
     videoResults.innerHTML = videoHTML;
 });
