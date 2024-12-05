@@ -22,8 +22,6 @@ async function handleFileOpen(args) {
    
         const form = new FormData();
         form.append('video', file);
-
-        console.log(prox_res);
        // prox_res.then((res) => async function() {
             console.log(prox_res);
             form.append('id', prox_res.data.vid_id);

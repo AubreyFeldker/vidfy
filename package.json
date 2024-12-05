@@ -6,6 +6,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "electron-forge start",
+    "serverstart": "cd server & start proxy-router & start metadata-store & start vid_server_a/video-store & start vid_server_b/video-store",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",

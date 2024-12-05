@@ -23,7 +23,7 @@ mongoose.set("strictQuery", false);
 mongoose.connect("mongodb://127.0.0.1/project6", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-});
+}).then(console.log("connected"));
 
 const app = express();
 app.use( bodyParser.json() ); 
@@ -57,17 +57,31 @@ app.post("/", async function (req, res) {
 
 app.get("/search-tags", async function (req, res) {
     const newTags = req.query.tags.split(" ");
-    const tags = await Tag.find({word: newTags[0]});
-    if (tags.length === 0)
+    let tag_files = [];
+    await Promise.all(newTags.map(async (userTag) => {
+        const tag = await Tag.findOne({word: userTag});
+        if (!tag)
+            return;
+        tag.foundIn.forEach((file) => {
+            const existFileIndex = tag_files.findIndex((el) => el.id === file);
+            if (existFileIndex === -1) {
+                file.tagMatch = 1;
+                tag_files.push({id: file, tagMatch: 1});
+            }
+            else {
+                tag_files[existFileIndex].tagMatch++;
+            }
+        });
+    }));
+    
+    if (tag_files.length === 0)
         return res.status(400).json({msg: "No videos with those tags found."});
-    const tag_files = tags[0].foundIn;
-    console.log(tag_files);
+    tag_files.sort((a,b) => b.tagMatch - a.tagMatch);
     const files = [];
     await Promise.all(tag_files.map(async (file) => {
-        const foundFile = await File.findOne({_id: file});
+        const foundFile = await File.findOne({_id: file.id});
         files.push(foundFile);
     }));
-    console.log(await File.find({}));
     return res.status(200).json(files);
 });
 
@@ -82,7 +96,7 @@ axios.post("http://localhost:5000/link-server",
         type: "metadata",
         address: "http://localhost:6000"
     }
-).then((res) => console.log(res))
+).then((res) => console.log(res.data))
 .catch((err) => console.log(err));
 
 const server = app.listen(6000, function () {

@@ -8,6 +8,7 @@ app.use(bodyParser.json())
 
 let metadata_server_addr = null;
 const storage_addrs = new Map();
+const store_addrs_array = [];
 const await_tags = new Map();
 
 app.get("/", function (req, res) {
@@ -23,7 +24,8 @@ app.post("/file-upload", async function (req, res) {
     try {
         const this_id = Date.now();
         await_tags.set(this_id, req.body.tags);
-        res.status(200).send({vid_id: this_id, vid_server: storage_addrs.values().next().value.addr});
+        const upload_addr = storage_addrs.get(store_addrs_array[Math.floor(Math.random() * store_addrs_array.length)]).addr;
+        res.status(200).send({vid_id: this_id, vid_server: upload_addr});
     }
     catch (error) {
         res.status(400).send();
@@ -36,7 +38,7 @@ app.post("/file-confirm", async function (req, res) {
     const await_tags_key = parseInt(req.body.this_id);
     const file_tags = await_tags.get(await_tags_key) ?? [];
     if (file_tags.length === 0)
-        res.status(400).send("Tags were not properly uploaded.");
+        return res.status(400).send("Tags were not properly uploaded.");
     
     const metadata_res = await axios.post(metadata_server_addr, {
         file_id: req.body.file_id,
@@ -84,7 +86,8 @@ app.post("/link-server", function (req, res) {
     else {
         const server_id = req.body.id;
         storage_addrs.set(server_id, {addr: server_address, alive: true});
-        console.log(storage_addrs.entries().next().value);
+        store_addrs_array.push(server_id);
+        console.log(storage_addrs.get(server_id));
     }
     return res.status(200).send({message: "You're connected to the server."});
 });
