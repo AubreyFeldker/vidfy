@@ -13,27 +13,33 @@ if (require('electron-squirrel-startup')) {
     app.quit();
 }
 
+// Uses electron to open a video file of the user's choosing
+// Adds it to a form, then starts server communication
 async function handleFileOpen(args) {
     console.log(args.filters);
+    //Uses electron's interface with system file explorer
     const { canceled, filePaths } = await dialog.showOpenDialog({filters: args.filters});
     if (!canceled && args.tags != "") {
-        const prox_res = await axios.post(`http://localhost:5000/file-upload`, {tags: args.tags})
-        const file = new File([fs.readFileSync(filePaths[0])], filePaths[0])
+        // Gives the server the tags and makes sure it is all set up before uploading video
+        const prox_res = await axios.post(`http://localhost:5000/file-upload`, {tags: args.tags});
+        const file = new File([fs.readFileSync(filePaths[0])], filePaths[0]);
    
+        // Must create a form to upload the file
         const form = new FormData();
         form.append('video', file);
-       // prox_res.then((res) => async function() {
-            console.log(prox_res);
-            form.append('id', prox_res.data.vid_id);
-            const response = await fetch(`${prox_res.data.vid_server}/file-upload`, {
-                method: 'POST',
-                body: form
-            });
-            return("Video uploaded!");
-        //});
+        console.log(prox_res);
+        //Response from proxy has both the global video ID of the video to be uploaded,
+        //and the address for the server being uploaded to
+        form.append('id', prox_res.data.vid_id);
+        const response = await fetch(`${prox_res.data.vid_server}/file-upload`, {
+            method: 'POST',
+            body: form
+        });
+        return("Video uploaded!");
     }
 };
 
+// Search for a set of user-defined tags from the MongoDB database
 async function search(args) {
     const response = await axios.get("http://localhost:5000/search", {params: {tags: args.tags}});
     console.log(response.data);
