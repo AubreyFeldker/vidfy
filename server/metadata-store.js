@@ -103,6 +103,8 @@ app.post("/purge", async function (req, res) {
     return res.status(200).json("Purged database");
 });
 
+// SERVER CREATION
+
 axios.post("http://localhost:5000/link-server",
     {
         type: "metadata",

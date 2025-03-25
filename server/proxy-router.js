@@ -110,6 +110,8 @@ app.post("/link-server", function (req, res) {
     return res.status(200).send({message: "You're connected to the server."});
 });
 
+// SERVER CREATION
+
 //Sets up the server at localhost port 5000
 const server = app.listen(5000, function () {
     const port = server.address().port;

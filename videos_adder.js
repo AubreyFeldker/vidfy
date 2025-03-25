@@ -1,3 +1,6 @@
+// File for adding a high concentration of videos with randomized tags
+// for both stress-testing and checking if the tag searching works
+
 const fs = require("fs");
 const fs_prom = require("fs/promises");
 const path = require("path");
