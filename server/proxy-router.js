@@ -71,11 +71,13 @@ app.get("/search", async function (req, res) {
     console.log(`${metadata_server_addr}/search-tags`);
     //Search metadata store for videos based off the tags provided
     const metadata_res = await axios.get(`${metadata_server_addr}/search-tags`, {params: {tags: req.query.tags}});
-    console.log(metadata_res);
-    if (metadata_res) {
+    const search_params = metadata_res.data;
+    console.log(search_params);
+    if (search_params) {
         // Maps the server ids of each video's location to server addresses
         // because the server address may change
-        const changed_addrs = metadata_res.data.map((file) => {
+        const valid_addrs = search_params.filter((file) => storage_addrs.has(file.locations[0]));
+        const changed_addrs = valid_addrs.map((file) => {
             return {_id: file._id,
                 tags: file.tags,
                 location: storage_addrs.get(file.locations[0]).addr
@@ -105,7 +107,6 @@ app.post("/link-server", function (req, res) {
         const server_id = req.body.id;
         storage_addrs.set(server_id, {addr: server_address, alive: true});
         store_addrs_array.push(server_id);
-        console.log(storage_addrs.get(server_id));
     }
     return res.status(200).send({message: "You're connected to the server."});
 });

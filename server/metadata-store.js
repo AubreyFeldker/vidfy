@@ -6,6 +6,7 @@ const { Schema } = mongoose;
 
 const fileSchema = new Schema({
     _id: Number,
+    popularity: Number | null,
     tags: [String],
     locations: [String],
 });
@@ -44,6 +45,7 @@ app.post("/", async function (req, res) {
     //Create file object from the request body and save it
     const file = new File({
         _id: file_id,
+        popularity: 0,
         tags: newTags,
         locations: [file_loc],
     });
@@ -52,13 +54,26 @@ app.post("/", async function (req, res) {
     //For each tag as a part of the video, find the corresponding tag document
     // and add the new video it appears on; creating a new doc if necessary
     for (const newTag of newTags) {
-        const result = await Tag.findOneAndUpdate({word: newTag}, { $set: {word: newTag}, $push: {foundIn: file._id}}, {upsert: true, new: true}).exec();
+        const result = await Tag.findOneAndUpdate(
+            {word: newTag},
+            { $set: {word: newTag}, $push: {foundIn: file._id}},
+            {upsert: true, new: true}
+        ).exec();
         console.log(result);
     }
 
     res.status(200).json({file_id: file._id});
 });
 
+//Grab a list of the most popular videos
+app.get("/popular", async function(req, res) {
+    const vidCount = req.query.count;
+    const popularVids = File.find().sort({popularity: -1}).limit(vidCount);
+    res.status(200).json(popularVids);
+});
+
+//Grab a list of videos best matching the provided
+//list of tags
 app.get("/search-tags", async function (req, res) {
     const newTags = req.query.tags.split(" ");
     let tag_files = [];
@@ -85,6 +100,7 @@ app.get("/search-tags", async function (req, res) {
     if (tag_files.length === 0)
         return res.status(400).json({msg: "No videos with those tags found."});
     // Sort videos by the number of matching tags they have to the query, descending
+    // then limit it to a certain number
     tag_files.sort((a,b) => b.tagMatch - a.tagMatch);
     const files = [];
     //Get the file documents from the database for each video chosen
@@ -93,7 +109,12 @@ app.get("/search-tags", async function (req, res) {
         files.push(foundFile);
     }));
     // Return files to proxy
-    return res.status(200).json(files);
+    res.status(200).json(files);
+
+    // Increase the popularity of all files found by one after sending them back
+    for(const file of files) {
+        await Tag.findOneAndUpdate({_id: file._id}, {$inc:{"popularity":1}}).exec();
+    }
 });
 
 //Removes all tags from the database
